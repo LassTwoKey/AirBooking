@@ -18,9 +18,6 @@
         if (location.hash) return location.hash.replace("#", "");
     }
     let bodyLockStatus = true;
-    let bodyLockToggle = (delay = 500) => {
-        if (document.documentElement.classList.contains("lock")) bodyUnlock(delay); else bodyLock(delay);
-    };
     let bodyUnlock = (delay = 500) => {
         let body = document.querySelector("body");
         if (bodyLockStatus) {
@@ -53,20 +50,8 @@
             setTimeout((function() {
                 bodyLockStatus = true;
             }), delay);
-            window.addEventListener("click", (e => {
-                const currentBlock = e.target;
-                if ("" == currentBlock.classList.value) menuClose();
-            }));
         }
     };
-    function menuInit() {
-        if (document.querySelector(".icon-menu")) document.addEventListener("click", (function(e) {
-            if (bodyLockStatus && e.target.closest(".icon-menu")) {
-                bodyLockToggle();
-                document.documentElement.classList.toggle("menu-open");
-            }
-        }));
-    }
     function menuClose() {
         bodyUnlock();
         document.documentElement.classList.remove("menu-open");
@@ -528,8 +513,34 @@
             btn.innerHTML = "play";
         }
     }));
+    const burger = document.querySelector(".icon-menu");
+    window.addEventListener("click", closeTouch);
+    burger.addEventListener("click", toggleMenu);
+    function closeTouch(e) {
+        const currentBlock = e.target;
+        if ("" == currentBlock.classList.value) toggleMenu();
+    }
+    function toggleMenu(e) {
+        let lock_padding = document.querySelectorAll("[data-lp]");
+        if (document.documentElement.classList.contains("menu-open") && document.documentElement.classList.contains("lock")) {
+            for (let index = 0; index < lock_padding.length; index++) {
+                const el = lock_padding[index];
+                el.style.paddingRight = "0px";
+            }
+            document.body.style.paddingRight = "0px";
+            document.documentElement.classList.remove("lock");
+            document.documentElement.classList.remove("menu-open");
+        } else {
+            for (let index = 0; index < lock_padding.length; index++) {
+                const el = lock_padding[index];
+                el.style.paddingRight = window.innerWidth - document.querySelector(".wrapper").offsetWidth + "px";
+            }
+            document.body.style.paddingRight = window.innerWidth - document.querySelector(".wrapper").offsetWidth + "px";
+            document.documentElement.classList.add("lock");
+            document.documentElement.classList.add("menu-open");
+        }
+    }
     window["FLS"] = false;
     isWebp();
-    menuInit();
     pageNavigation();
 })();
